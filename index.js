@@ -1,100 +1,30 @@
+const fs = require('fs');
+const path = require('path');
+// eslint-disable-next-line no-undef
+const typeDefs = fs.readFileSync(path.resolve(__dirname, 'sheet.graphql'), 'utf8');
 const { google } = require('googleapis');
 const { getValues, addRow } = require('./util');
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer } = require('apollo-server');
 
-const typeDefs = gql`
-  enum Availability {
-    LOW
-    MED
-    HIGH
-  }
-  
-  enum CommunicationPreference {
-    VIDEO_CHAT
-    CHAT
-    EMAIL
-  }
-
-  enum LearningStyle {
-    TUTORIALS
-    DOCUMENTATION
-    PAIR PROGRAMMING
-    BOOKS
-  }
-
-  enum SkillLevel {
-    BEGINNER
-    INTERMEDIATE
-    ADVANCED
-  }
-
-  type ProgrammingLanguage {
-    language: String!
-    skill_level: SkillLevel
-  }
-
-  input ProgrammingLanguageInput {
-    language: String!
-    skill_level: SkillLevel
-  }
-
-  type Response {
-    name: String
-    github_username: String
-    discord_username: String
-    availability: Availability
-    time_zone: String
-    interests: [String]
-    programming_languages: [ProgrammingLanguage]
-    current_skillset: [String]
-    desired_skillset: String
-    learning_style: [LearningStyle]
-    communication_preference: [CommunicationPreference]
-  }
-
-  input ResponseInput {
-    name: String
-    github_username: String
-    discord_username: String
-    availability: Availability
-    time_zone: String
-    interests: [String]
-    programming_languages: [ProgrammingLanguageInput]
-    current_skillset: [String]
-    desired_skillset: String
-    learning_style: [LearningStyle]
-    communication_preference: [CommunicationPreference]
-  }
-
-  type Query {
-    responses: [Response]
-  }
-
-  type Mutation {
-    createResponse(response: ResponseInput!): Boolean
-    updateResponse(response: ResponseInput!, where: Int!): Boolean
-    # TODO: updateResponse mutation
-  }
-`;
-
+////////////////////////////////////////////////
 const resolvers = {
   Query: {
     responses: async (_, args, ctx) => {
       const response = await getValues(ctx);
-      return response; 
+      return response;
     },
   },
-
   Mutation: {
     createResponse: async (_, { response }, ctx) => {
       const res = await addRow(ctx, response);
       return res;
-    }
-  }
+    },
+  },
 };
+////////////////////////////////////////////////
 
-const server = new ApolloServer({ 
-  typeDefs, 
+const server = new ApolloServer({
+  typeDefs,
   resolvers,
   context: async () => {
     const auth = await google.auth.getClient({
@@ -102,12 +32,12 @@ const server = new ApolloServer({
         'https://www.googleapis.com/auth/spreadsheets',
         'https://docs.google.com/feeds',
         'https://spreadsheets.google.com/feeds',
-      ]
-    }); 
+      ],
+    });
     return {
-      auth
-    }
-  }
+      auth,
+    };
+  },
 });
 
 server.listen().then(({ url }) => {
