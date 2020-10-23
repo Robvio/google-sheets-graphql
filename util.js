@@ -45,7 +45,7 @@ function singleArrayToJSON(array){
     fields.forEach((field, index)=>{
       const value = array[i][index];
       if(value){
-        response[field] = JSON.parse(value);
+        response[field] = value;
       }else{
         response[field] = null;
       }

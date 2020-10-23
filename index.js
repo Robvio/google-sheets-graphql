@@ -3,7 +3,6 @@ const { getValues, addRow } = require('./util');
 const { ApolloServer, gql } = require('apollo-server');
 
 const typeDefs = gql`
-
   enum Availability {
     LOW
     MED
@@ -76,7 +75,6 @@ const typeDefs = gql`
     updateResponse(response: ResponseInput!, where: Int!): Boolean
     # TODO: updateResponse mutation
   }
-
 `;
 
 const resolvers = {
@@ -100,8 +98,11 @@ const server = new ApolloServer({
   resolvers,
   context: async () => {
     const auth = await google.auth.getClient({
-      // Scopes can be specified either as an array or as a single, space-delimited string.
-      scopes: ['https://www.googleapis.com/auth/spreadsheets']
+      scopes: [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://docs.google.com/feeds',
+        'https://spreadsheets.google.com/feeds',
+      ]
     }); 
     return {
       auth

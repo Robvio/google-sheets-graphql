@@ -9,7 +9,7 @@
   "dependencies": {
     "apollo-server": "^2.1.0",
     "dotenv": "^6.0.0",
-    "googleapis": "^34.0.0",
+    "googleapis": "^61.0.0",
     "graphql": "^14.0.2",
     "graphql-tools": "^4.0.0"
   },
